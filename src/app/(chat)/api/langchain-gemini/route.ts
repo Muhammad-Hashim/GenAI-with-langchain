@@ -1,10 +1,11 @@
-import { GoogleGenerativeAI } from "@langchain/google-genai";
-import { ChatPromptTemplate } from "langchain/prompts";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
-export async function POST(req) {
+
+export async function POST(req: { json: () => PromiseLike<{ question: any; }> | { question: any; }; }) {
   try {
     const { question } = await req.json();
-
+console.log(question)
     if (!question) {
       return Response.json({ error: "Question is required" }, { status: 400 });
     }
@@ -12,7 +13,7 @@ export async function POST(req) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     // Initialize LangChain with Gemini
-    const model = new GoogleGenerativeAI({ model: "gemini-pro", apiKey });
+    const model = new ChatGoogleGenerativeAI({ model: "gemini-pro", apiKey });
 
     // Create a chat prompt template
     const prompt = ChatPromptTemplate.fromMessages([
@@ -25,7 +26,7 @@ export async function POST(req) {
 
     // Invoke the chain with user input
     const response = await chain.invoke({ question });
-
+  console.log(response.text)
     return Response.json({ answer: response.text });
   } catch (error) {
     console.error("Error:", error);
