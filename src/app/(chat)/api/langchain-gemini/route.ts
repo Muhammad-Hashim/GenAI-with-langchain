@@ -1,13 +1,13 @@
+import { NextRequest, NextResponse } from "next/server";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
-
-export async function POST(req: { json: () => PromiseLike<{ question: any; }> | { question: any; }; }) {
+export async function POST(req: NextRequest) {
   try {
     const { question } = await req.json();
-console.log(question)
+
     if (!question) {
-      return Response.json({ error: "Question is required" }, { status: 400 });
+      return NextResponse.json({ error: "Question is required" }, { status: 400 });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -26,10 +26,10 @@ console.log(question)
 
     // Invoke the chain with user input
     const response = await chain.invoke({ question });
-  console.log(response.text)
-    return Response.json({ answer: response.text });
+
+    return NextResponse.json({ answer: response.text });
   } catch (error) {
     console.error("Error:", error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
